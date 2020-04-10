@@ -2,8 +2,8 @@
 
 namespace App\Http;
 
-use App\HTTP\Middleware\AdminMiddleware;
-use App\HTTP\Middleware\AuthorMiddleware;
+use App\Http\Middleware\AdminMiddleware;
+use App\Http\Middleware\AuthorMiddleware;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
 class Kernel extends HttpKernel
@@ -59,10 +59,9 @@ class Kernel extends HttpKernel
         'cache.headers' => \Illuminate\Http\Middleware\SetCacheHeaders::class,
         'can' => \Illuminate\Auth\Middleware\Authorize::class,
         'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
+        'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'admin' => AdminMiddleware::class,
         'author' => AuthorMiddleware::class,
-
-
     ];
 }

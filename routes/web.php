@@ -11,54 +11,27 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', 'HomeController@index')->name('home');
+Route::get('posts','PostController@index')->name('post.index');
+Route::get('post/{slug}','PostController@details')->name('post.details');
+
+
 
 Auth::routes();
-Route::get('/home', 'HomeController@index')->name('home');
 
-
-// // Route::group(['as'=>'admin.','prefix'=>'admin' ,   'namespace'=>'admin' 'middleware'=>['auth', 'admin']], function(){
-
-    
-// //      Route::get('dashboard', 'DashboardController@index')->name('dashboard');
-
-
-// // });
-
-
-
-// // Route::group(['as'=>'admin.','prefix'=>'admin' ,   'namespace'=>'admin' 'middleware'=>['auth', 'admin']], function(){
-
-    
-// //     Route::get('dashboard', 'DashboardController@index')->name('dashboard');
-
-
-// Route::group(['as'=>'author.','prefix'=>'author','namespace'=>'Author','middleware'=>['auth','author']], function (){
-//     Route::get('dashboard','DashboardController@index')->name('dashboard');
-
-
-
-// });
-
-
-
-
-// Route::group(['as'=> 'prefix'=>'author.' ,   'namespace'=>'author' 'middleware'=>['auth', 'author']], function(){
-
-//     Route::get('dashboard', 'DashboardController@index')->name('dashboard');
-
-// });
-
+Route::group(['middleware'=>['auth']], function (){
+ );
+});
 
 
 Route::group(['as'=>'admin.','prefix'=>'admin','namespace'=>'Admin','middleware'=>['auth','admin']], function (){
     Route::get('dashboard','DashboardController@index')->name('dashboard');
+
 });
 
 Route::group(['as'=>'author.','prefix'=>'author','namespace'=>'Author','middleware'=>['auth','author']], function (){
     Route::get('dashboard','DashboardController@index')->name('dashboard');
 
+   
 });
 

@@ -15,7 +15,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'role_id','name','username','email', 'password',
     ];
 
     /**
@@ -27,11 +27,27 @@ class User extends Authenticatable
         'password', 'remember_token',
     ];
 
-    public function role(){
-
-        // return $this->belongsTo(related: 'App\Role');
-        
+    public function role()
+    {
         return $this->belongsTo('App\Role');
+    }
+    public function posts()
+    {
+        return $this->hasMany('App\Post');
+    }
 
+    public function favorite_posts()
+    {
+        return $this->belongsToMany('App\Post')->withTimestamps();
+    }
+
+    public function comments()
+    {
+        return $this->hasMany('App\Comment');
+    }
+
+    public function scopeAuthors($query)
+    {
+        return $query->where('role_id',2);
     }
 }
