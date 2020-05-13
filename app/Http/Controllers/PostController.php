@@ -2,46 +2,192 @@
 
 namespace App\Http\Controllers;
 
-use App\Category;
-use App\Post;
-use App\Tag;
 use Illuminate\Http\Request;
+use  DB; 
 use Illuminate\Support\Facades\Session;
 
-class PostController extends Controller
+class postController extends Controller
 {
+   public function writePost(){
+    
+    $category=DB::table('catagories')
+                  ->get();   
 
-    public function index()
-    {
-        $posts = Post::latest()->approved()->published()->paginate(6);
-        return view('posts',compact('posts'));
+    return view('posts.writepost', compact('category'));
+   }
+
+
+   public function deletepost($id){
+
+
+      $post=DB::table('tags')
+                    ->where('id', $id)
+                    ->delete();
+   
+                    if($post){
+                     $notification=array(
+           
+                        'messsage'=>'successfully delete  catagory',
+                        'alart-type'=>'success'
+                     );
+                    
+                     return Redirect()->route('all.posts')->with($notification);
+                     
+   
+     }
+   }
+
+
+   public function store_post(Request  $req){
+
+     $data=array();
+
+
+         $data['title']=$req->title;
+         $data['category_id']=$req->category_id;
+         $data['details']=$req->details;
+        
+
+         $image=$req->file('image');
+
+         if($image){
+
+            $image_name=hexdec(uniqid());
+            $next=strtolower($image->getClientOriginalExtension());
+            $image_full_name=$image_name. '.'.$next;
+            $upload_path='public/frontend/image/';
+            $image_url=$upload_path.$image_full_name;
+            $success=$image->move($upload_path,$image_full_name);
+            $data['image']=$image_url;
+            DB::table('tags')->insert($data);
+ 
+         //    $notification=array( 
+         //     'message'=>'successfully add student',
+         //     'alert-type'=>'success'
+         // );
+ 
+         Session::put('exception', 'successfully add student');
+
+
+
+         $notification=array(
+
+            'messsage'=>'successfully insert catagory',
+            'alart-type'=>'success'
+         );
+   
+         return Redirect()->back()->with($notification);
+
+
+         }
+
+         else{
+                     
+           
+      
+  
+     }
+    
+
+   }
+
+   
+   
+   public function all_post(){
+
+    
+      // $post=DB::table('tags')->get();
+
+     $post=DB::table('tags')
+           ->join('catagories','tags.category_id','catagories.id')
+           ->select('tags.*','catagories.name')
+           //->get();
+         ->paginate(3);
+
+
+      return view('posts.allpost', compact('post'));
+
     }
-    public function details($slug)
-    {
-        $post = Post::where('slug',$slug)->approved()->published()->first();
 
-        $blogKey = 'blog_' . $post->id;
 
-        if (!Session::has($blogKey)) {
-            $post->increment('view_count');
-            Session::put($blogKey,1);
-        }
-        $randomposts = Post::approved()->published()->take(3)->inRandomOrder()->get();
-        return view('post',compact('post','randomposts'));
+
+    public function edit_post($id){
+
+     $category=DB::table('catagories')->get();
+      $post=DB::table('tags')
+               ->where('id', $id)
+                ->first();
+
+      return view('posts.post_view', compact('category','post'));
+      
+      
+
+
 
     }
+    
 
-    public function postByCategory($slug)
-    {
-        $category = Category::where('slug',$slug)->first();
-        $posts = $category->posts()->approved()->published()->get();
-        return view('category',compact('category','posts'));
+    public function update_post(Request  $req, $id){
+
+      $data=array();
+ 
+ 
+          $data['title']=$req->title;
+          $data['category_id']=$req->category_id;
+          $data['details']=$req->details;
+         
+ 
+          $image=$req->file('image');
+ 
+          if($image){
+ 
+             $image_name=hexdec(uniqid());
+             $next=strtolower($image->getClientOriginalExtension());
+             $image_full_name=$image_name. '.'.$next;
+             $upload_path='public/frontend/image/';
+             $image_url=$upload_path.$image_full_name;
+             $success=$image->move($upload_path,$image_full_name);
+             $data['image']=$image_url;
+
+            unlink($req->old_photo);
+             DB::table('tags')
+             ->where ('id', $id)
+             ->update($data);
+
+          $notification=array(
+             'messsage'=>'successfully update',
+             'alart-type'=>'success'
+          );
+          return Redirect()->route('all.posts')->with($notification);
+          }
+          else{           
+            $data['image']=$req->old_photo;
+            DB::table('tags')
+            ->where ('id', $id)
+            ->update($data);
+            $notification=array(
+               'messsage'=>'successfully  update',
+               'alart-type'=>'success'
+            );
+            return Redirect()->route('all.posts')->with($notification);
+   
+      }
+     
+
+
+   
+
+
+ 
     }
 
-    public function postByTag($slug)
-    {
-        $tag = Tag::where('slug',$slug)->first();
-        $posts = $tag->posts()->approved()->published()->get();
-        return view('tag',compact('tag','posts'));
-    }
+    
+
+
+
+
+
+
+
+
 }

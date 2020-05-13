@@ -2,15 +2,27 @@
 
 namespace App\Http\Controllers;
 
-use App\User;
 use Illuminate\Http\Request;
 
-class AuthorController extends Controller
+class HomeController extends Controller
 {
-    public function profile($username)
+    /**
+     * Create a new controller instance.
+     *
+     * @return void
+     */
+    public function __construct()
     {
-        $author = User::where('username',$username)->first();
-        $posts = $author->posts()->approved()->published()->get();
-        return view('profile',compact('author','posts'));
+        $this->middleware('auth');
+    }
+
+    /**
+     * Show the application dashboard.
+     *
+     * @return \Illuminate\Contracts\Support\Renderable
+     */
+    public function index()
+    {
+        return view('home');
     }
 }
